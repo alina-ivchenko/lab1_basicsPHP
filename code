@@ -1,0 +1,58 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+header('Content-type: text/plain; charset=utf-8');
+
+const entryPoint = './';
+const space = "\t";
+const slash = '/';
+const enter = "\n";
+
+function outputElement(string $element, string $space)
+{
+    echo $space.$element.enter;
+}
+
+function outputDir(string $fullPath, string $element, string $space)
+{
+    outputElement($element, $space);
+    buildTree($fullPath, $space.space);
+}
+
+function outputLink(string $fullPath, string $element, string $space)
+{
+    outputElement($element, $space);
+    echo $space.space.readlink($fullPath).enter;
+}
+
+function checkType(string $fullPath, string $element, string $space)
+{
+    if (is_dir($fullPath)) {
+        outputDir($fullPath, $element, $space);
+    } elseif (is_link($fullPath)) {
+        outputLink($fullPath, $element, $space);
+    } else {
+        outputElement($element, $space);
+    }
+}
+
+function search(string $startDir, string $element, string $space)
+{
+    if (!($element === '.') && !($element === '..')) {
+        $fullPath = $startDir.slash.$element;
+        checkType($fullPath, $element, $space);
+    }
+}
+
+function buildTree(string $startDir, string $space)
+{
+    if (opendir($startDir)) {
+        $list = scandir($startDir);
+        foreach ($list as $element) {
+            search($startDir, $element, $space);
+        }
+    }
+}
+
+buildTree(entryPoint, '');
