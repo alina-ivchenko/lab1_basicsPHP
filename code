@@ -54,3 +54,4 @@ function buildTree(string $startDir, string $space)
 }
 
 buildTree(entryPoint, '');
+
